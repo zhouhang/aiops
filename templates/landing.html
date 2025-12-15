@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product_type }} - 超值优惠包</title>
+    <style>
+        /* ... 保持原有样式不变 ... */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background-image: url('image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="none" stroke="%234a4a8a" stroke-width="0.5" opacity="0.3"/></svg>');
+        }
+        .container {
+            text-align: center;
+            max-width: 500px;
+            background: rgba(15, 12, 41, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid #4a4a8a;
+            border-radius: 20px;
+            padding: 40px 30px;
+            box-shadow: 0 0 30px rgba(74, 74, 138, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+        .container::before {
+            content: "";
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: linear-gradient(45deg, #ff00cc, #333399);
+            z-index: -1;
+            border-radius: 25px;
+            animation: borderAnimation 3s linear infinite;
+            opacity: 0.7;
+        }
+        @keyframes borderAnimation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px #00f3ff;
+            letter-spacing: 2px;
+        }
+        .user-name {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #00f3ff;
+        }
+        .game-title {
+            font-size: 22px;
+            margin: 15px 0;
+            color: #ffcc00;
+            text-shadow: 0 0 8px rgba(255, 204, 0, 0.5);
+        }
+        .coupon {
+            background: linear-gradient(135deg, #ff00cc 0%, #333399 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            margin: 25px 0;
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            box-shadow: 0 0 15px rgba(255, 0, 204, 0.5);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 15px rgba(255, 0, 204, 0.5); }
+            50% { box-shadow: 0 0 25px rgba(255, 0, 204, 1); }
+            100% { box-shadow: 0 0 15px rgba(255, 0, 204, 0.5); }
+        }
+        .timer {
+            background: rgba(255, 0, 204, 0.2);
+            color: #ff00cc;
+            padding: 10px;
+            border-radius: 10px;
+            font-weight: bold;
+            margin: 20px 0;
+            border: 1px solid #ff00cc;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            background: linear-gradient(135deg, #00f3ff 0%, #0077ff 100%);
+            color: #0f0c29;
+            border: none;
+            padding: 16px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 50px;
+            margin: 25px 0;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.6);
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.8);
+        }
+        .success-message {
+            background: rgba(0, 255, 100, 0.2);
+            color: #00ff66;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-weight: bold;
+            border: 1px solid #00ff66;
+            display: none;
+        }
+        .terms {
+            color: #aaa;
+            font-size: 12px;
+            margin-top: 20px;
+            line-height: 1.5;
+        }
+        .footer {
+            color: #666;
+            font-size: 12px;
+            margin-top: 30px;
+            border-top: 1px solid #4a4a8a;
+            padding-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">{{ product_type }}</div>
+        <div class="user-name">尊敬的 {{ user_name }}</div>
+        <div class="game-title">您关注的{{ product_type }}</div>
+        
+        <!-- 倒计时区域（由JS动态更新） -->
+        <div id="timer" class="timer">
+            ⏰ {{ coupon }}加载中...
+        </div>
+        
+        <div class="coupon">
+            {{ coupon }}
+        </div>
+        
+        <p>立即领取，购买装备补给包立减！</p>
+        
+        <button id="claimBtn" class="btn" onclick="claimCoupon()">
+            立即领取
+        </button>
+        
+        <div id="successMsg" class="success-message">
+            ✅ 领取成功！优惠券已存入您的游戏账户
+        </div>
+        
+        <p class="terms">
+            * 本券仅限{{ product_type }}游戏内商城使用<br>
+            * 有效期至 {{ token_expired }}
+        </p>
+        
+        <div class="footer">
+            © 2026 皮皮运营团队
+        </div>
+    </div>
+
+    <script>
+    // 从服务器获取的剩余秒数（FastAPI 渲染时注入）
+    const secondsLeft = '{{ token_time_left }}';
+    let timeRemaining = secondsLeft;
+    const timerEl = document.getElementById('timer');
+    const claimBtn = document.getElementById('claimBtn');
+
+    // 倒计时函数
+    function updateCountdown() {
+        if (timeRemaining <= 0) {
+            timerEl.innerHTML = "⏰ 优惠券已过期";
+            claimBtn.disabled = true;
+            claimBtn.textContent = "已过期";
+            claimBtn.style.background = "linear-gradient(135deg, #999, #666)";
+            return;
+        }
+        
+        const h = Math.floor(timeRemaining / 3600);
+        const m = Math.floor((timeRemaining % 3600) / 60);
+        const s = timeRemaining % 60;
+        timerEl.innerHTML = `⏰ {{ coupon }} ${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')} 后失效`;
+        timeRemaining--;
+    }
+
+    // 启动倒计时
+    updateCountdown(); // 立即显示
+    const countdownInterval = setInterval(updateCountdown, 1000);
+
+    // 领取函数
+    async function claimCoupon() {
+        if (claimBtn.disabled) return;
+        
+        try {
+            // 调用服务器领取接口
+            const response = await fetch('/coupon/get', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: '{{ user_name }}',
+                    token: '{{ token }}'
+                })
+            });
+            // 解析响应数据
+            const data = await response.json();
+            
+            if (data.status_code === "200") {
+                // 领取成功
+                claimBtn.disabled = true;
+                claimBtn.textContent = "已领取";
+                claimBtn.style.background = "linear-gradient(135deg, #4CAF50, #2E7D32)";
+                document.getElementById('successMsg').style.display = "block";
+                
+                // 停止倒计时
+                clearInterval(countdownInterval);
+            } else if  (data.status_code === "500") {
+                // 业务错误（如未打开链接、非本人券）
+                alert(data.message || "领取失败，请重试");
+                // 恢复按钮状态（允许重试）
+                btn.disabled = false;
+                btn.textContent = "立即领取";
+                btn.style.background = "linear-gradient(135deg, #00f3ff, #0077ff)";
+            } else {
+                alert(404);
+                // 其他错误（如404）
+                alert("系统错误，请稍后重试");
+                btn.disabled = false;
+                btn.textContent = "立即领取";
+                btn.style.background = "linear-gradient(135deg, #00f3ff, #0077ff)";
+            }
+        } catch (error) {
+            console.error("领取请求失败:", error);
+            alert("网络错误，请检查连接");
+            // 恢复按钮状态
+            const btn = document.getElementById('claimBtn');
+            btn.disabled = false;
+            btn.textContent = "立即领取";
+            btn.style.background = "linear-gradient(135deg, #00f3ff, #0077ff)";
+        }
+    }
+    </script>
+</body>
+</html>
