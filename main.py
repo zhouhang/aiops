@@ -73,6 +73,8 @@ async def create_recalls(request: Request):
         recall_record["user_name"] = recall_user.get("user_name")
         recall_record["token"] = uuid.uuid4().hex
         recall_record["token_expired"] = datetime.now(timezone.utc) + timedelta(days=7)
+        recall_record["product"] = recall_user.get("product")
+        recall_record["product_type"] = recall_user.get("product_type")
         recall_record["contact"] = recall_user.get("contact")
         recall_record["contact_type"] = recall_user.get("contact_type")
         recall_records.append(recall_record)
@@ -96,6 +98,7 @@ async def recall_landing(request: Request, token: str):
     recallService.recall_click(token)
     id = recall.get("id")
     user_name = recall.get("user_name", "尊敬的用户") if recall else "尊敬的用户"
+    product = recall.get("product")
     product_type = recall.get("product_type")
     coupon_value = recall.get("coupon_value")
     coupon_type = recall.get("coupon_type")
@@ -132,6 +135,7 @@ async def recall_landing(request: Request, token: str):
             "id": id,
             "user_name": user_name,
             "coupon": coupon,
+            "product": product,
             "product_type": product_type,
             "token": token,
             "token_expired": token_expired,
