@@ -8,7 +8,7 @@ from utils.sms.yunpian import SmsRecallSender
 
 logger = logging.getLogger(__name__)
 recallDAO = RecallDAO()
-smsRecallSender = SmsRecallSender("123")
+smsRecallSender = SmsRecallSender()
 
 class RecallService(BaseService):
 

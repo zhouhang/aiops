@@ -6,7 +6,7 @@ import os
 load_dotenv()
 
 class WeChatRecallSender:
-    def __init__(self, corp_id: str, secret: str):
+    def __init__(self):
         corp_id = os.getenv("WECHAT_CORP_ID")
         secret = os.getenv("WECHAT_SECRET")
         self.client = WeChatClient(corp_id, secret)
