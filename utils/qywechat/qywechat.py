@@ -1,8 +1,14 @@
 from typing import Dict, List
 from wechatpy.enterprise import WeChatClient
+from dotenv import load_dotenv
+import os
+# 加载 .env（只在应用启动时调用一次）
+load_dotenv()
 
 class WeChatRecallSender:
-    def __init__(self, corp_id, secret):
+    def __init__(self, corp_id: str, secret: str):
+        corp_id = os.getenv("WECHAT_CORP_ID")
+        secret = os.getenv("WECHAT_SECRET")
         self.client = WeChatClient(corp_id, secret)
     
     # 获取部门下的成员列表

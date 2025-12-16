@@ -14,10 +14,10 @@ class MerchantService(BaseService):
             return {"status": "error", "message": "商户ID不能为空"}
         return merchantDao.get_merchant_by_id(merchant_id)
     
-    def get_merchant_by_name(self, merchant_name: str) -> Dict:
-        if not merchant_name:
-            return {"status": "error", "message": "商户名称不能为空"}
-        return merchantDao.get_merchant_by_name(merchant_name)
+    def get_merchant_by_username(self, username: str) -> Dict:
+        if not username:
+            return None
+        return merchantDao.get_merchant_by_username(username)
 
     def create_merchant(self, merchant_data: Dict) -> int:
         if not merchant_data:

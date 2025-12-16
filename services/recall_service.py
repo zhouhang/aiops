@@ -23,12 +23,11 @@ class RecallService(BaseService):
         # 更新召回记录为打开状态
         return recallDAO.mark_recall_clicked(token)
 
-    def recall_claim(self, recall_id: int) -> int:
-        if not recall_id:
-            return {"status": "error", "message": "召回ID不能为空"}
-        print(recall_id)
+    def recall_claim(self, token: str) -> int:
+        if not token:
+            return {"status": "error", "message": "Token不能为空"}
         # 更新召回记录为已认领状态
-        return recallDAO.mark_recall_claimed(recall_id)
+        return recallDAO.mark_recall_claimed(token)
 
     def create_recalls(self, recalls: list[Dict]) -> int:
         if not recalls:

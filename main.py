@@ -29,17 +29,20 @@ recallService = RecallService()
 
 # === 1. API 接口：登录接口 ===
 @app.post("/login")
-def login(request: Request) -> Dict:
-    body = request.json()
+async def login(request: Request) -> Dict:
+    body = await request.json()
     username = body.get("username", None)
     password = body.get("password", None)
     if username is None:
         return {"status_code": "500", "message": "请填写用户名"}
-    user = merchantService.get_user_by_name(username)
+    user = merchantService.get_merchant_by_username(username)
+    # 检查用户是否存在
+    if user is None:
+        return {"status_code": "500", "message": "用户不存在"}
     # 进行用户名密码校验
-    if user['password'] != hashlib.sha256(f"{password}".encode()).hexdigest():
+    if user.get('password') != hashlib.sha256(f"{password}".encode()).hexdigest():
         return {"status_code": "500", "message": "密码不正确"}
-    name = user['name']
+    name = user.get('name', username)
     token = hashlib.sha256(f"{username}{password}{datetime.now().timestamp()}".encode()).hexdigest()
     #将token存储n天，避免下次还要登录
 
@@ -102,8 +105,21 @@ async def recall_landing(request: Request, token: str):
     product_type = recall.get("product_type")
     coupon_value = recall.get("coupon_value")
     coupon_type = recall.get("coupon_type")
-    token_expired = datetime.strptime(str(recall.get("token_expired")), "%Y-%m-%d %H:%M:%S")
-    now = datetime.now()
+    # 处理token_expired，可能是datetime对象或字符串
+    token_expired_raw = recall.get("token_expired")
+    if isinstance(token_expired_raw, str):
+        try:
+            token_expired = datetime.strptime(token_expired_raw, "%Y-%m-%d %H:%M:%S")
+        except ValueError:
+            try:
+                token_expired = datetime.fromisoformat(token_expired_raw.replace('Z', '+00:00'))
+            except ValueError:
+                token_expired = datetime.now(timezone.utc) + timedelta(days=7)
+    elif isinstance(token_expired_raw, datetime):
+        token_expired = token_expired_raw
+    else:
+        token_expired = datetime.now(timezone.utc) + timedelta(days=7)
+    now = datetime.now(timezone.utc) if token_expired.tzinfo else datetime.now()
     token_time_left = (token_expired - now).total_seconds()
     token_time_left = max(0, int(token_time_left))  # 防止负数
 
@@ -118,8 +134,11 @@ async def recall_landing(request: Request, token: str):
     #解析优惠券展示
     coupon = ""
     if coupon_type == "full_minus":
-        threshold, amount = coupon_value.split("-")
-        coupon = f"满{threshold}元立减{amount}元优惠券"
+        try:
+            threshold, amount = coupon_value.split("-")
+            coupon = f"满{threshold}元立减{amount}元优惠券"
+        except (ValueError, AttributeError):
+            coupon = f"满额立减优惠券"
     
     if coupon_type == "no_threshold":
         coupon = f"立减{coupon_value}元优惠券"
@@ -149,8 +168,12 @@ async def get_coupon(request: Request) -> Dict:
     body = await request.json()
     token = body.get("token", None)
     user_name = body.get("username", None)
+    if not token:
+        return {"status_code": "500", "message": "token不能为空"}
     recall = recallService.get_recall(token)
-    click = recall.get("click", 1)
+    if recall is None:
+        return {"status_code": "500", "message": "无效的优惠券链接"}
+    click = recall.get("click", 0)
     if click != 1:
         return {"status_code": "500", "message": "请先打开优惠券链接！"}
     recall_user_name = recall.get("user_name")

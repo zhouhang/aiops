@@ -1,5 +1,22 @@
-fastapi
-uvicorn[standard]
-jinja2
-pymysql
-python-dotenv
+# Web框架
+fastapi>=0.104.1
+uvicorn[standard]>=0.24.0
+
+# 模板引擎
+jinja2>=3.1.2
+
+# 数据库
+pymysql>=1.1.0
+DBUtils>=3.0.3
+
+# 环境变量
+python-dotenv>=1.0.0
+
+# 短信服务
+yunpian-python-sdk>=1.2.0
+
+# 企业微信
+wechatpy>=1.8.18
+
+# 类型提示（Python < 3.9）
+typing-extensions>=4.8.0; python_version < "3.9"
